@@ -69,7 +69,7 @@ int sdoClientUpload(
 
         timer1msPrev = CO_timer1ms;
         sleepTime.tv_sec = 0;
-        sleepTime.tv_nsec = 10000000;
+        sleepTime.tv_nsec = 500000;
 
         do {
             uint16_t timer1ms, timer1msDiff;
@@ -80,7 +80,8 @@ int sdoClientUpload(
             timer1msPrev = timer1ms;
 
             ret = CO_SDOclientUpload(SDOclient, timer1msDiff, SDOtimeoutTime, dataRxLen, SDOabortCode);
-            nanosleep(&sleepTime, NULL);
+            if(ret != 0)
+                nanosleep(&sleepTime, NULL);
         } while(ret > 0);
 
         CO_SDOclientClose(SDOclient);
@@ -132,7 +133,7 @@ int sdoClientDownload(
 
         timer1msPrev = CO_timer1ms;
         sleepTime.tv_sec = 0;
-        sleepTime.tv_nsec = 5000000;
+        sleepTime.tv_nsec = 500000;
 
         do {
             uint16_t timer1ms, timer1msDiff;
@@ -143,7 +144,8 @@ int sdoClientDownload(
             timer1msPrev = timer1ms;
 
             ret = CO_SDOclientDownload(SDOclient, timer1msDiff, SDOtimeoutTime, SDOabortCode);
-            nanosleep(&sleepTime, NULL);
+            if(ret != 0)
+                nanosleep(&sleepTime, NULL);
         } while(ret > 0);
 
         CO_SDOclientClose(SDOclient);

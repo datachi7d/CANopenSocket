@@ -140,6 +140,8 @@ fprintf(stderr,
 "\n");
 }
 
+typedef enum CMD_MODE {CMD_NONE, CMD_LOCAL, CMD_REMOTE} cmdMode_t;
+cmdMode_t commandEnableG = CMD_NONE;
 
 /******************************************************************************/
 /** Mainline and RT thread                                                   **/
@@ -156,7 +158,6 @@ int main (int argc, char *argv[]) {
     int nodeId = -1;                /* Use value from Object Dictionary or set to 1..127 by arguments */
     bool_t rebootEnable = false;    /* Configurable by arguments */
 #ifndef CO_SINGLE_THREAD
-    typedef enum CMD_MODE {CMD_NONE, CMD_LOCAL, CMD_REMOTE} cmdMode_t;
     cmdMode_t commandEnable = CMD_NONE;   /* Configurable by arguments */
 #endif
 
@@ -203,6 +204,7 @@ int main (int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
+    commandEnableG = commandEnable;
 
     if(optind < argc) {
         CANdevice = argv[optind];
@@ -545,6 +547,8 @@ static void* rt_thread(void* arg) {
 
             /* Execute optional additional application code */
             app_program1ms();
+            if(commandEnableG == CMD_NONE)
+                usleep(3000);
 
             /* Detect timer large overflow */
             if(OD_performance[ODA_performance_timerCycleMaxTime] > TMR_TASK_OVERFLOW_US && rtPriority > 0 && CO->CANmodule[0]->CANnormal) {
